@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<head>
+  <title>Mine Sweeper</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+</head>
+<body>
+  <div id="app">
+    <div v-for="(mineArrRow, rowX) in mineArr" :key="rowX">
+      <div v-for="(item, colX) in mineArrRow" :key="colX" id="col">
+        <span
+          ><button class="cell" v-on:click="click(rowX, colX)">
+            {{item}}
+          </button></span
+        >
+      </div>
+    </div>
+    <div>
+      <button class="ctl" v-on:click="initMine">Start</button>
+      <button class="ctl">Reset</button>
+    </div>
+  </div>
+</body>
+
+<script>
+  let app = new Vue({
+    el: "#app",
+    data: {
+      ncol: 10,
+      nrow: 10,
+      nMine: 10,
+      mineArr: Array(),
+      cellLabel: "?",
+    },
+    methods: {
+      click: function (r, c) {
+        console.log("clicked " + r + " " + c);
+      },
+      initMine: function () {
+        console.log("clicked init mine");
+        let count = this.ncol * this.nrow;
+        let originalArray = new Array();
+        for (let i = 0; i < count; i++) {
+          originalArray[i] = i;
+        }
+        originalArray.sort(function () {
+          return 0.5 - Math.random();
+        });
+        for (let i = 0; i < this.nMine; i++) {
+          position = originalArray[i];
+          coordX = position % this.ncol;
+          coordY = parseInt(position / this.ncol);
+          console.log("Mine at position (" + coordX + ", " + coordY + ")");
+          // @TODO: Why doesn't work
+          // app.$set(this.mineArr, "*", this.mineArr[coordY][coordX]);
+          this.mineArr[coordY].splice([coordX], 1, "*");
+        }
+      },
+      // @TODO: set board
+      setBoard() {},
+      initArr() {
+        for (let index = 0; index < this.nrow; index++) {
+          rowArr = Array();
+          for (let index = 0; index < this.ncol; index++) {
+            rowArr.push(0);
+          }
+          //   console.log(rowArr);
+          this.mineArr.push(rowArr);
+        }
+        console.log(this.mineArr);
+      },
+    },
+    created() {
+      this.initArr();
+    },
+  });
+</script>
+
+<style>
+  .cell {
+    width: 50px;
+    height: 50px;
+    margin: 2px;
+  }
+  .cell :hover {
+    background-color: gray;
+  }
+  .ctl {
+    width: 50px;
+    height: 25px;
+    margin: 2px;
+  }
+  #col {
+    display: inline;
+  }
+</style>
