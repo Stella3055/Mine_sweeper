@@ -5,22 +5,31 @@
   <!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
 </head>
 <body>
+  <h2>Mine Sweeper Game Board</h2>
   <div id="app">
-    <div v-for="(mineArrRow, rowX) in mineArr" :key="rowX">
+    <div v-for="(mineArrRow, rowX) in mineArr" :key="rowX" id="row">
       <div v-for="(item, colX) in mineArrRow" :key="colX" id="col">
         <span
-          ><button class="cell" v-on:click="click(rowX, colX)">
-            <div v-if="visibilityArr[rowX][colX]">
+          ><button
+            class="cell"
+            @click="click(rowX, colX)"
+            @click.right="flag(rowX, colX)"
+          >
+            <!-- release mode -->
+            <!-- <div v-if="visibilityArr[rowX][colX]" id="text"> -->
+            <!-- debug mode -->
+            <div id="text">
               {{item}}
             </div>
           </button></span
         >
       </div>
     </div>
-    <div>
-      <button class="ctl" v-on:click="initMine">Start</button>
-      <button class="ctl">Reset</button>
+    <div class="ctl">
+      <button @click="initMine" v-if="gameStatus == 'idle'">Start</button>
+      <button @click="resetBoard">reset</button>
     </div>
+    <div id="notification"><h3>{{gameStatus}}</h3></div>
   </div>
 </body>
 
@@ -35,12 +44,31 @@
       mineCoordArr: [],
       visibilityArr: [],
       cellLabel: "?",
+      gameStatus: "idle",
+      flagDict: {},
+      // win: false,
     },
     methods: {
       click: function (r, c) {
         console.log("clicked " + r + " " + c);
         this.visibilityArr[r].splice([c], 1, true);
         console.log(this.visibilityArr);
+        if (this.mineArr[r][c] == "*") {
+          this.gameStatus = "GG......";
+        }
+        this.checkWin()
+      },
+      flag: function (r, c) {
+        if (this.mineArr[r][c] == "F") {
+          this.visibilityArr[r].splice([c], 1, false);
+          this.mineArr[r].splice([c], 1, this.flagDict[r.toString() + c]);
+        } else {
+          this.visibilityArr[r].splice([c], 1, true);
+          this.flagDict[r.toString() + c] = this.mineArr[r][c];
+          this.mineArr[r].splice([c], 1, "F");
+        }
+        console.log(this.flagDict);
+        this.checkWin()
       },
       initMine: function () {
         console.log("clicked init mine");
@@ -96,12 +124,13 @@
             }
           }
         }
+        this.gameStatus = "continue";
       },
       initArr() {
-        for (let index = 0; index < this.nrow; index++) {
-          rowArr = Array();
+        for (let indexR = 0; indexR < this.nrow; indexR++) {
+          rowArr = [];
           visRow = [];
-          for (let index = 0; index < this.ncol; index++) {
+          for (let indexC = 0; indexC < this.ncol; indexC++) {
             rowArr.push(0);
             visRow.push(false);
           }
@@ -112,6 +141,35 @@
         console.log(this.mineArr);
         console.log(this.visibilityArr);
       },
+      resetBoard() {
+        this.mineArr = [];
+        this.mineCoordArr = [];
+        this.visibilityArr = [];
+        this.gameStatus = "idle";
+        this.initArr();
+        // this.setBoard();
+      },
+      checkWin() {
+        let win = true;
+        let flagCount = 0;
+        for (let indexR = 0; indexR < this.nrow; indexR++) {
+          for (let indexC = 0; indexC < this.ncol; indexC++) {
+            if (this.mineArr[indexR][indexC] == "F") {
+              flagCount ++;
+            }
+            if (this.mineArr[indexR][indexC] == "*") {
+              win = false;
+            }
+          }
+        }
+        console.log(flagCount);
+        if (flagCount != this.nMine) {
+          win = false
+        }
+        if (win) {
+          this.gameStatus = "You Win"
+        }
+      },
     },
     created() {
       this.initArr();
@@ -121,19 +179,38 @@
 
 <style>
   .cell {
+    display: flex;
     width: 50px;
     height: 50px;
-    margin: 2px;
+    margin: 1px;
+    text-align: center;
   }
-  /* .cell :hover {
-    background-color: gray;
-  } */
   .ctl {
-    width: 50px;
-    height: 25px;
-    margin: 2px;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
-  #col {
-    display: inline;
+  #row {
+    display: flex;
+    justify-content: center;
+  }
+  button {
+    display: flex;
+    width: 50px;
+    margin: 1px;
+    justify-content: center;
+  }
+  #text {
+    display: flex;
+    align-self: center;
+  }
+  h2 {
+    display: flex;
+    justify-content: center;
+  }
+  #notification {
+    display: flex;
+    justify-content: center;
   }
 </style>
