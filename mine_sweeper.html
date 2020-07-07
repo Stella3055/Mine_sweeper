@@ -10,7 +10,9 @@
       <div v-for="(item, colX) in mineArrRow" :key="colX" id="col">
         <span
           ><button class="cell" v-on:click="click(rowX, colX)">
-            {{item}}
+            <div v-if="visibilityArr[rowX][colX]">
+              {{item}}
+            </div>
           </button></span
         >
       </div>
@@ -31,11 +33,14 @@
       nMine: 10,
       mineArr: [],
       mineCoordArr: [],
+      visibilityArr: [],
       cellLabel: "?",
     },
     methods: {
       click: function (r, c) {
         console.log("clicked " + r + " " + c);
+        this.visibilityArr[r].splice([c], 1, true);
+        console.log(this.visibilityArr);
       },
       initMine: function () {
         console.log("clicked init mine");
@@ -80,10 +85,14 @@
               coordSurrounding[index][0] < this.ncol &&
               0 <= coordSurrounding[index][1] &&
               coordSurrounding[index][1] < this.nrow &&
-              this.mineArr[coordSurrounding[index][1]][coordSurrounding[index][0]] != "*"
+              this.mineArr[coordSurrounding[index][1]][
+                coordSurrounding[index][0]
+              ] != "*"
             ) {
               coordSurroundingSelect.push(coordSurrounding[index]);
-              this.mineArr[coordSurrounding[index][1]][coordSurrounding[index][0]] ++
+              this.mineArr[coordSurrounding[index][1]][
+                coordSurrounding[index][0]
+              ]++;
             }
           }
         }
@@ -91,13 +100,17 @@
       initArr() {
         for (let index = 0; index < this.nrow; index++) {
           rowArr = Array();
+          visRow = [];
           for (let index = 0; index < this.ncol; index++) {
             rowArr.push(0);
+            visRow.push(false);
           }
           //   console.log(rowArr);
           this.mineArr.push(rowArr);
+          this.visibilityArr.push(visRow);
         }
         console.log(this.mineArr);
+        console.log(this.visibilityArr);
       },
     },
     created() {
@@ -112,9 +125,9 @@
     height: 50px;
     margin: 2px;
   }
-  .cell :hover {
+  /* .cell :hover {
     background-color: gray;
-  }
+  } */
   .ctl {
     width: 50px;
     height: 25px;
