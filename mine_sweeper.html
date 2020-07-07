@@ -29,7 +29,8 @@
       ncol: 10,
       nrow: 10,
       nMine: 10,
-      mineArr: Array(),
+      mineArr: [],
+      mineCoordArr: [],
       cellLabel: "?",
     },
     methods: {
@@ -54,10 +55,39 @@
           // @TODO: Why doesn't work
           // app.$set(this.mineArr, "*", this.mineArr[coordY][coordX]);
           this.mineArr[coordY].splice([coordX], 1, "*");
+          this.mineCoordArr.push([coordX, coordY]);
+        }
+        console.log(this.mineCoordArr);
+        this.setBoard();
+      },
+      setBoard() {
+        for (let index = 0; index < this.mineCoordArr.length; index++) {
+          coordEach = this.mineCoordArr[index];
+          coordSurrounding = [
+            [coordEach[0], coordEach[1] + 1],
+            [coordEach[0] + 1, coordEach[1]],
+            [coordEach[0], coordEach[1] - 1],
+            [coordEach[0] - 1, coordEach[1]],
+            [coordEach[0] + 1, coordEach[1] + 1],
+            [coordEach[0] + 1, coordEach[1] - 1],
+            [coordEach[0] - 1, coordEach[1] + 1],
+            [coordEach[0] - 1, coordEach[1] - 1],
+          ];
+          coordSurroundingSelect = [];
+          for (let index = 0; index < coordSurrounding.length; index++) {
+            if (
+              0 <= coordSurrounding[index][0] &&
+              coordSurrounding[index][0] < this.ncol &&
+              0 <= coordSurrounding[index][1] &&
+              coordSurrounding[index][1] < this.nrow &&
+              this.mineArr[coordSurrounding[index][1]][coordSurrounding[index][0]] != "*"
+            ) {
+              coordSurroundingSelect.push(coordSurrounding[index]);
+              this.mineArr[coordSurrounding[index][1]][coordSurrounding[index][0]] ++
+            }
+          }
         }
       },
-      // @TODO: set board
-      setBoard() {},
       initArr() {
         for (let index = 0; index < this.nrow; index++) {
           rowArr = Array();
