@@ -16,9 +16,9 @@
             @click.right="flag(rowX, colX)"
           >
             <!-- release mode -->
-            <!-- <div v-if="visibilityArr[rowX][colX]" id="text"> -->
+            <div v-if="visibilityArr[rowX][colX]" id="text">
             <!-- debug mode -->
-            <div id="text">
+            <!-- <div id="text"> -->
               {{item}}
             </div>
           </button></span
@@ -173,6 +173,9 @@
     },
     created() {
       this.initArr();
+      document.oncontextmenu = function (event) {
+            event.preventDefault();
+        };
     },
   });
 </script>
